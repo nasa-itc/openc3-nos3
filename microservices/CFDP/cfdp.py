@@ -8,7 +8,7 @@ from openc3.api import *
 class CFDP(Microservice):
     def __init__(self, name):
         super().__init__(name)
-        self.TARGET_NAME = "CFDP"
+        self.TARGET_NAME = os.environ.get("CFDP_TARGET_NAME", "CFDP_DEBUG")
         self.TLM_PACKET_NAME = "DOWNLINK_FILE_PKT"
         self.CMD_PACKET_NAME = "UPLOAD_TO_SATELLITE_DATA"
         self.period = 2  # 1 second

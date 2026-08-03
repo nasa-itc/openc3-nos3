@@ -30,6 +30,8 @@ services:
     volumes:
       - "openc3-bucket-v:/data"
       - "./cacert.pem:/devel/cacert.pem:z"
+      - "./send_files:/send_files"
+      - "./received_files:/received_files"
     command: server --address ":9000" --console-address ":9001" /data
     restart: "unless-stopped"
     logging:
@@ -55,6 +57,8 @@ services:
     volumes:
       - "openc3-redis-v:${OPENC3_REDIS_VOLUME:-/data}"
       - "./cacert.pem:/devel/cacert.pem:z"
+      - "./send_files:/send_files"
+      - "./received_files:/received_files"
       - "./openc3-redis/users.acl:/config/users.acl:z"
     restart: "unless-stopped"
     logging:
@@ -74,6 +78,8 @@ services:
     volumes:
       - "openc3-redis-ephemeral-v:${OPENC3_REDIS_VOLUME:-/data}"
       - "./cacert.pem:/devel/cacert.pem:z"
+      - "./send_files:/send_files"
+      - "./received_files:/received_files"
       - "./openc3-redis/users.acl:/config/users.acl:z"
     restart: "unless-stopped"
     command: ["redis-server", "/config/redis_ephemeral.conf"]
@@ -100,6 +106,8 @@ services:
       - "openc3-gems-v:/gems"
       - "./plugins:/plugins:z"
       - "./cacert.pem:/devel/cacert.pem:z"
+      - "./send_files:/send_files"
+      - "./received_files:/received_files"
     logging:
       driver: "json-file"
       options:
@@ -130,6 +138,8 @@ services:
       - "openc3-gems-v:/gems:ro"
       - "./plugins:/plugins:z"
       - "./cacert.pem:/devel/cacert.pem:z"
+      - "./send_files:/send_files"
+      - "./received_files:/received_files"
     logging:
       driver: "json-file"
       options:
@@ -168,6 +178,8 @@ services:
       - "openc3-gems-v:/gems:ro"
       - "./plugins:/plugins:z"
       - "./cacert.pem:/devel/cacert.pem:z"
+      - "./send_files:/send_files"
+      - "./received_files:/received_files"
       # Add access to the entire C drive on Windows
       # - "/c:/c"
     logging:
@@ -194,6 +206,8 @@ services:
     image: "${OPENC3_REGISTRY}/${OPENC3_NAMESPACE}/openc3-traefik${OPENC3_IMAGE_SUFFIX}:${OPENC3_TAG}"
     volumes:
       - "./cacert.pem:/devel/cacert.pem:z"
+      - "./send_files:/send_files"
+      - "./received_files:/received_files"
       - "./openc3-traefik/traefik.yaml:/etc/traefik/traefik.yaml:z"
       # - "./openc3-traefik/traefik-allow-http.yaml:/etc/traefik/traefik.yaml:z"
       # - "./openc3-traefik/traefik-ssl.yaml:/etc/traefik/traefik.yaml:z"
@@ -234,6 +248,8 @@ services:
       - "openc3-gems-v:/gems"
       - "./plugins:/plugins:z"
       - "./cacert.pem:/devel/cacert.pem:z"
+      - "./send_files:/send_files"
+      - "./received_files:/received_files"
     logging:
       driver: "json-file"
       options:

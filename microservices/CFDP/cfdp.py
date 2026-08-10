@@ -13,7 +13,13 @@ from openc3.utilities.sleeper import Sleeper
 class CFDP(Microservice):
     def __init__(self, name):
         super().__init__(name)
-        self.TARGET_NAME = os.environ.get("CFDP_TARGET_NAME", "CFDP_DEBUG")
+        self.TARGET_NAME = os.environ.get("CFDP_TARGET_NAME", "CFDP_RADIO")
+        # DEBUG and RADIO carry the same downlink telemetry and run as separate
+        # microservices. Only one of them may assemble files in the shared
+        # /received_files volume, otherwise every data PDU is appended twice.
+        self.DOWNLOAD_TARGET_NAME = os.environ.get(
+            "CFDP_DOWNLOAD_TARGET_NAME", "CFDP_RADIO"
+        )
         self.TLM_PACKET_NAME = "DOWNLINK_FILE_PKT"
         self.CMD_PACKET_NAME = "UPLOAD_TO_SATELLITE_DATA"
         self.period = 2
@@ -143,12 +149,20 @@ class CFDP(Microservice):
     def _process_packet(self, packet):
         direction = int(packet["DIRECTION"])
         if direction == 1:
-            self._receive_file_packet(packet)
+            if self.TARGET_NAME == self.DOWNLOAD_TARGET_NAME:
+                self._receive_file_packet(packet)
         elif direction == 2:
             self._send_file(packet)
 
     def run(self):
         self.sleeper.sleep(self.period)
+        if self.TARGET_NAME == self.DOWNLOAD_TARGET_NAME:
+            self.logger.info(f"Receiving CFDP files from {self.TARGET_NAME}")
+        else:
+            self.logger.info(
+                f"Ignoring mirrored CFDP downloads from {self.TARGET_NAME}; "
+                f"{self.DOWNLOAD_TARGET_NAME} owns the ground file"
+            )
         subscription = subscribe_packets(
             [[self.TARGET_NAME, self.TLM_PACKET_NAME]]
         )
